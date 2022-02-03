@@ -7,7 +7,7 @@ import classes from "./AvailableMeals.module.css";
 const AvailableMeals = () => {
   const [meals, setMeals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [httpError, setHttpError] = useState();
+  //const [httpError, setHttpError] = useState();
 
   useEffect(() => {
     // const fetchMeals = async () => {
@@ -79,13 +79,13 @@ const AvailableMeals = () => {
     );
   }
 
-  if (httpError) {
-    return (
-      <section className={classes.MealsError}>
-        <p>{httpError}</p>
-      </section>
-    );
-  }
+  // if (httpError) {
+  //   return (
+  //     <section className={classes.MealsError}>
+  //       <p>{httpError}</p>
+  //     </section>
+  //   );
+  // }
 
   const mealsList = meals.map((meal) => (
     <MealItem

@@ -4,26 +4,37 @@ import Modal from "../UI/Modal";
 import CartItem from "./CartItem";
 import classes from "./Cart.module.css";
 import CartContext from "../../store/cart-context";
-//import Checkout from "./Checkout";
+import Checkout from "./Checkout";
 
 const Cart = (props) => {
   const [isCheckout, setIsCheckout] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [didSubmit, setDidSubmit] = useState(false);
   const cartCtx = useContext(CartContext);
+  const [userD, setUserData] = useState();
 
   const totalAmount = `${cartCtx.totalAmount.toFixed(2)}`;
   const hasItems = cartCtx.items.length > 0;
-  let whatsapptext = "Please send ";
+  let whatsapptext = "https://wa.me/918800649339?text=I would like to order ";
   if (hasItems) {
     cartCtx.items.forEach((x) => {
       whatsapptext += x.amount.toString() + " " + x.name + " ";
     });
-    whatsapptext += "of total amount " + totalAmount.toString();
-    //console.log(whatsapptext);
+    whatsapptext += "of total amount " + totalAmount.toString() + ". ";
+    console.log(userD);
+    if (userD) {
+      whatsapptext +=
+        "Please send to " +
+        userD.name +
+        ", " +
+        userD.street +
+        ", " +
+        userD.city +
+        " - " +
+        userD.postalCode;
+    }
+    whatsapptext = encodeURI(whatsapptext);
   }
-  const finalWAText =
-    "https://wa.me/918368103143?text=" + encodeURI(whatsapptext);
 
   const cartItemRemoveHandler = (id) => {
     cartCtx.removeItem(id);
@@ -33,23 +44,30 @@ const Cart = (props) => {
     cartCtx.addItem(item);
   };
 
-  // const orderHandler = () => {
-  //   setIsCheckout(true);
-  // };
+  const orderHandler = () => {
+    setIsCheckout(true);
+  };
 
-  // const submitOrderHandler = async (userData) => {
-  //   setIsSubmitting(true);
-  //   await fetch("https://react-http-6b4a6.firebaseio.com/orders.json", {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       user: userData,
-  //       orderedItems: cartCtx.items,
-  //     }),
-  //   });
-  //   setIsSubmitting(false);
-  //   setDidSubmit(true);
-  //   cartCtx.clearCart();
-  // };
+  const submitOrderHandler = async (userData) => {
+    setUserData(userData);
+    setIsSubmitting(true);
+    // await fetch(whatsapptext, {
+    //   method: "GET",
+    //   // body: JSON.stringify({
+    //   //   user: userData,
+    //   //   orderedItems: cartCtx.items,
+    //   // }),
+    // });
+    // setIsSubmitting(false);
+    // setDidSubmit(true);
+    // cartCtx.clearCart();
+  };
+
+  const proceedToWA = () => {
+    setIsSubmitting(false);
+    setDidSubmit(true);
+    cartCtx.clearCart();
+  };
 
   const cartItems = (
     <ul className={classes["cart-items"]}>
@@ -72,14 +90,14 @@ const Cart = (props) => {
         Close
       </button>
       {hasItems && (
-        // <button className={classes.button} onClick={orderHandler}>
-        //   Order
-        // </button>
-        <button className={classes.button}>
-          <a target="_blank" href={finalWAText}>
-            Order
-          </a>
+        <button className={classes.button} onClick={orderHandler}>
+          Continue
         </button>
+        // <button className={classes.button}>
+        //   <a target="_blank" href={finalWAText}>
+        //     Order
+        //   </a>
+        // </button>
       )}
     </div>
   );
@@ -91,14 +109,26 @@ const Cart = (props) => {
         <span>Total Amount</span>
         <span>&#8377; {totalAmount}</span>
       </div>
-      {/* {isCheckout && (
+      {isCheckout && (
         <Checkout onConfirm={submitOrderHandler} onCancel={props.onClose} />
-      )} */}
+      )}
       {!isCheckout && modalActions}
     </React.Fragment>
   );
 
-  const isSubmittingModalContent = <p>Sending order data...</p>;
+  const isSubmittingModalContent = (
+    <React.Fragment>
+      <p>Proceed with the order!</p>
+      <div className={classes.actions}>
+        <button className={classes.button} onClick={proceedToWA}>
+          <a target="_blank" rel="noreferrer" href={whatsapptext}>
+            Send Order
+          </a>
+        </button>
+      </div>
+    </React.Fragment>
+  );
+  // <p>Sending order data...</p>;
 
   const didSubmitModalContent = (
     <React.Fragment>
